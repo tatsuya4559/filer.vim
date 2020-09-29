@@ -62,7 +62,7 @@ function! filer#init() abort
     call filter(l:files, 'v:val =~# "^[^.]"')
   endif
   silent keepmarks keepjumps call setline(1, sort(l:files, function('s:compare')))
-  setlocal nomodified nomodifiable
+  setlocal nomodified
 endfunction
 
 function! filer#open() abort
@@ -88,7 +88,6 @@ function! filer#command() abort
 endfunction
 
 function! filer#show_fullpath() abort
-  setlocal modifiable
   silent keepmarks keepjumps call setline(1, map(getline('1', '$'), {_, v -> s:curdir() .. v}))
 endfunction
 
