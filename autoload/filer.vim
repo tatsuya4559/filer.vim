@@ -31,13 +31,12 @@ function! s:current() abort
   return getline('.')
 endfunction
 
-function! s:cursor_path() abort
-  if s:current()[0] ==# '/'
-    return s:current()
+function! s:fullpath(path) abort
+  if a:path[0] ==# '/'
+    return a:path
   else
-    return  s:curdir() .. s:current()
+    return  s:curdir() .. a:path
   endif
-
 endfunction
 
 function! filer#init() abort
@@ -66,7 +65,7 @@ function! filer#init() abort
 endfunction
 
 function! filer#open() abort
-  exe 'edit' s:cursor_path()
+  exe 'edit' s:fullpath(s:current())
 endfunction
 
 function! filer#up() abort
@@ -83,12 +82,12 @@ function! filer#reload() abort
 endfunction
 
 function! filer#command() abort
-  let l:path = s:cursor_path()
+  let l:path = s:fullpath(s:current())
   call feedkeys(':! ' .. shellescape(l:path) .. "\<c-home>\<right>", 'n')
 endfunction
 
 function! filer#show_fullpath() abort
-  silent keepmarks keepjumps call setline(1, map(getline('1', '$'), {_, v -> s:curdir() .. v}))
+  silent keepmarks keepjumps call setline(1, map(getline('1', '$'), {_, v -> s:fullpath(v)}))
 endfunction
 
 function! filer#toggle_hidden() abort
