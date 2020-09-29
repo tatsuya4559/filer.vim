@@ -3,7 +3,7 @@ if exists('b:current_syntax')
 endif
 
 syn match filerDirectory '^.\+/$'
-syn match filerHidden '^\..\+$'
+syn match filerHidden '^\(/.\+/\)\?\..\+$'
 
 hi! def link filerDirectory Directory
 hi! def link filerHidden Comment
