@@ -1,10 +1,10 @@
-nnoremap <Plug>(filer-open) :<C-u>call filer#open()<CR>
-nnoremap <Plug>(filer-up) :<C-u>call filer#up()<CR>
-nnoremap <Plug>(filer-reload) :<C-u>call filer#reload()<CR>
-nnoremap <Plug>(filer-home) :<C-u>call filer#home()<CR>
-nnoremap <Plug>(filer-toggle-hidden) :<C-u>call filer#toggle_hidden()<CR>
-nnoremap <Plug>(filer-command) :<C-u>call filer#command()<CR>
-nnoremap <Plug>(filer-fullpath) :<C-u>call filer#show_fullpath()<CR>
+nnoremap <silent> <Plug>(filer-open) :<C-u>call filer#open()<CR>
+nnoremap <silent> <Plug>(filer-up) :<C-u>call filer#up()<CR>
+nnoremap <silent> <Plug>(filer-reload) :<C-u>call filer#reload()<CR>
+nnoremap <silent> <Plug>(filer-home) :<C-u>call filer#home()<CR>
+nnoremap <silent> <Plug>(filer-toggle-hidden) :<C-u>call filer#toggle_hidden()<CR>
+nnoremap <silent> <Plug>(filer-command) :<C-u>call filer#command()<CR>
+nnoremap <silent> <Plug>(filer-fullpath) :<C-u>call filer#show_fullpath()<CR>
 
 if !hasmapto('<Plug>(filer-open)')
   nmap <buffer> <CR> <Plug>(filer-open)
