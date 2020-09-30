@@ -32,7 +32,7 @@ function! s:current() abort
 endfunction
 
 function! s:fullpath(path) abort
-  if a:path[0] ==# '/'
+  if a:path =~# '^/'
     return a:path
   else
     return  s:curdir() .. a:path
