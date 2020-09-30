@@ -69,7 +69,7 @@ function! filer#open() abort
 endfunction
 
 function! filer#up() abort
-  let l:dir = fnamemodify(s:curdir(), ':p:h:h:gs!\!/!')
+  let l:dir = fnamemodify(s:curdir(), ':p:h:h:gs?\?/?')
   exe 'edit' l:dir
 endfunction
 
