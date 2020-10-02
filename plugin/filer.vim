@@ -17,5 +17,11 @@ augroup __filer__
   autocmd ShellCmdPost * nested if exists('b:dir') | call filer#reload() | endif
 augroup END
 
+nnoremap <silent> <Plug>(filer-start) :<C-u>call filer#start()<CR>
+
+if !hasmapto('<Plug>(filer-start)')
+  nmap - <Plug>(filer-start)
+endif
+
 let &cpoptions = s:save_cpo
 unlet s:save_cpo

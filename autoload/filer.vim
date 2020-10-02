@@ -64,7 +64,17 @@ function! filer#init() abort
   setlocal nomodified
 endfunction
 
-function! filer#open() abort
+function! filer#start() abort
+  let l:file_from = fnamemodify(bufname('%'), ':t')
+  let l:path = expand('%:h')
+  if empty(l:path)
+    let l:path = getcwd()
+  endif
+  execute 'edit' fnameescape(l:path)
+  call search('\V\^' .. l:file_from, 'c')
+endfunction
+
+function! filer#down() abort
   exe 'edit' s:fullpath(s:current())
 endfunction
 
