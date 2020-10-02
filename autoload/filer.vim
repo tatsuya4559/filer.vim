@@ -44,12 +44,12 @@ function! filer#init() abort
   if !isdirectory(l:path)
     return
   endif
-  let l:dir = fnamemodify(l:path, ':p:gs?\?/?')
+  let l:dir = fnamemodify(l:path, ':p')
   if isdirectory(l:dir) && l:dir !~# '/$'
     let l:dir ..= '/'
   endif
 
-  if tr(bufname('%'), '\', '/') !=# l:dir
+  if bufname('%') !=# l:dir
     exe 'noautocmd' 'silent' 'noswapfile' 'file' l:dir
   endif
   let b:dir = l:dir
