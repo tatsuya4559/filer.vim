@@ -70,7 +70,7 @@ function! filer#start() abort
   if empty(l:dir)
     let l:dir = getcwd()
   endif
-  execute 'edit' fnameescape(l:dir)
+  execute 'edit' fnameescape(l:dir) .. '/'
   call search('\V\^' .. l:file_from, 'c')
 endfunction
 
@@ -80,8 +80,8 @@ endfunction
 
 function! filer#up() abort
   let l:dir_from = fnamemodify(s:curdir(),':p:h:t')
-  let l:dir_to = fnamemodify(s:curdir(), ':p:h:h:gs?\?/?')
-  exe 'edit' fnameescape(l:dir_to)
+  let l:dir_to = fnamemodify(s:curdir(), ':p:h:h')
+  exe 'edit' fnameescape(l:dir_to) .. '/'
   call search('\V\^' .. l:dir_from, 'c')
 endfunction
 
