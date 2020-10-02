@@ -75,13 +75,13 @@ function! filer#start() abort
 endfunction
 
 function! filer#down() abort
-  exe 'edit' s:fullpath(s:current())
+  exe 'edit' fnameescape(s:fullpath(s:current()))
 endfunction
 
 function! filer#up() abort
   let l:dir_from = fnamemodify(s:curdir(),':p:h:t')
   let l:dir_to = fnamemodify(s:curdir(), ':p:h:h:gs?\?/?')
-  exe 'edit' l:dir_to
+  exe 'edit' fnameescape(l:dir_to)
   call search('\V\^' .. l:dir_from, 'c')
 endfunction
 
