@@ -66,11 +66,11 @@ endfunction
 
 function! filer#start() abort
   let l:file_from = fnamemodify(bufname('%'), ':t')
-  let l:path = expand('%:h')
-  if empty(l:path)
-    let l:path = getcwd()
+  let l:dir = expand('%:h')
+  if empty(l:dir)
+    let l:dir = getcwd()
   endif
-  execute 'edit' fnameescape(l:path)
+  execute 'edit' fnameescape(l:dir)
   call search('\V\^' .. l:file_from, 'c')
 endfunction
 
