@@ -61,7 +61,7 @@ function! filer#init() abort
 endfunction
 
 function! filer#start() abort
-  let l:file_from = fnamemodify(bufname('%'), ':t')
+  let l:file_from = expand('%:t')
   let l:dir = expand('%:h')
   if empty(l:dir)
     let l:dir = getcwd()
