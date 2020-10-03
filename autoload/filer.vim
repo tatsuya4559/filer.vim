@@ -32,11 +32,7 @@ function! s:current() abort
 endfunction
 
 function! s:fullpath(path) abort
-  if a:path =~# '^/'
-    return a:path
-  else
-    return  s:curdir() .. a:path
-  endif
+  return (a:path =~# '^/' ? '' : s:curdir()) .. a:path
 endfunction
 
 function! filer#init() abort
