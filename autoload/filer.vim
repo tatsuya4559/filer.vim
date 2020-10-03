@@ -99,8 +99,7 @@ function! filer#show_fullpath() abort
 endfunction
 
 function! filer#toggle_hidden() abort
-  let l:show_hidden = get(g:, 'filer_show_hidden', v:false)
-  let g:filer_show_hidden = !l:show_hidden
+  let g:filer_show_hidden = !get(g:, 'filer_show_hidden', v:false)
   call filer#reload()
 endfunction
 
