@@ -66,7 +66,7 @@ function! filer#start() abort
   if empty(l:dir)
     let l:dir = getcwd()
   endif
-  execute 'edit' fnameescape(l:dir) .. '/'
+  exe 'edit' fnameescape(l:dir) .. '/'
   call search('\V\^' .. l:file_from, 'c')
 endfunction
 
