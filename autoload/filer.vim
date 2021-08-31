@@ -50,7 +50,7 @@ function! filer#init() abort
   endif
   let b:dir = l:dir
   setlocal modifiable
-  setlocal filetype=filer buftype=nofile bufhidden=wipe nobuflisted noswapfile
+  setlocal filetype=filer buftype=nofile bufhidden=delete nobuflisted noswapfile
   setlocal nowrap cursorline
   let l:files = map(readdir(l:path, '1'), {_, v -> s:name(l:dir, v)})
   if !get(g:, 'filer_show_hidden', v:false)
