@@ -1,111 +1,113 @@
-function! s:name(base, fname) abort
-  let l:path = a:base .. a:fname
-  let l:type = getftype(l:path)
-  if l:type ==# 'link' || l:type ==# 'junction'
-    if isdirectory(resolve(l:path))
-      let l:type = 'dir'
+vim9script
+
+def Name(base: string, fname: string): string
+  const path = base .. fname
+  var ftype = getftype(path)
+  if ftype ==# 'link' || ftype ==# 'junction'
+    if isdirectory(resolve(path))
+      ftype = 'dir'
     endif
   endif
-  return a:fname .. (l:type ==# 'dir' ? '/' : '')
-endfunction
+  return fname .. (ftype ==# 'dir' ? '/' : '')
+enddef
 
-function! s:compare(lhs, rhs) abort
-  if a:lhs[-1:] ==# '/' && a:rhs[-1:] !=# '/'
+def Compare(lhs: string, rhs: string): number
+  if lhs[-1 : ] ==# '/' && rhs[-1 : ] !=# '/'
     return -1
-  elseif a:lhs[-1:] !=# '/' && a:rhs[-1:] ==# '/'
+  elseif lhs[-1 : ] !=# '/' && rhs[-1 : ] ==# '/'
     return 1
   endif
-  if a:lhs < a:rhs
+  if lhs < rhs
     return -1
-  elseif a:lhs > a:rhs
+  elseif lhs > rhs
     return 1
   endif
   return 0
-endfunction
+enddef
 
-function! s:curdir() abort
+def Curdir(): string
   return get(b:, 'dir', '')
-endfunction
+enddef
 
-function! s:current() abort
+def Current(): string
   return getline('.')
-endfunction
+enddef
 
-function! s:fullpath(path) abort
-  return (a:path =~# '^/' ? '' : s:curdir()) .. a:path
-endfunction
+def Fullpath(path: string): string
+  return (path =~# '^/' ? '' : Curdir()) .. path
+enddef
 
-function! filer#init() abort
-  let l:path = resolve(expand('%:p'))
-  if !isdirectory(l:path)
+export def Init(): void
+  const path = resolve(expand('%:p'))
+  if !isdirectory(path)
     return
   endif
-  let l:dir = fnamemodify(l:path, ':p')
-  if isdirectory(l:dir) && l:dir !~# '/$'
-    let l:dir ..= '/'
+  var dir = fnamemodify(path, ':p')
+  if isdirectory(dir) && dir !~# '/$'
+    dir ..= '/'
   endif
 
-  if bufname('%') !=# l:dir
-    exe 'noautocmd' 'silent' 'noswapfile' 'file' l:dir
+  if bufname('%') !=# dir
+    exe 'noautocmd' 'silent' 'noswapfile' 'file' dir
   endif
-  let b:dir = l:dir
+  b:dir = dir
   setlocal modifiable
   setlocal filetype=filer buftype=nofile bufhidden=delete nobuflisted noswapfile
   setlocal nowrap cursorline
-  let l:files = map(readdir(l:path, '1'), {_, v -> s:name(l:dir, v)})
-  if !get(g:, 'filer_show_hidden', v:false)
-    call filter(l:files, 'v:val =~# "^[^.]"')
+  final files = readdir(path, '1')->map((_, v) => Name(dir, v))
+  if !get(g:, 'filer_show_hidden', false)
+    filter(files, (_, v) => v =~# "^[^.]")
   endif
-  silent keepmarks keepjumps call setline(1, sort(l:files, function('s:compare')))
+  silent keepmarks keepjumps setline(1, sort(files, Compare))
   setlocal nomodified
-endfunction
+enddef
 
-function! filer#start() abort
-  let l:file_from = expand('%:t')
-  let l:dir = expand('%:h')
-  if empty(l:dir)
-    let l:dir = getcwd()
+export def Start(): void
+  const file_from = expand('%:t')
+  var dir = expand('%:h')
+  if empty(dir)
+    dir = getcwd()
   endif
-  exe 'edit' fnameescape(l:dir) .. '/'
-  call search('\V\^' .. l:file_from, 'c')
-endfunction
+  exe 'edit' fnameescape(dir) .. '/'
+  search('\V\^' .. file_from, 'c')
+enddef
 
-function! filer#down() abort
-  exe 'edit' fnameescape(s:fullpath(s:current()))
-endfunction
+export def Down(): void
+  exe 'edit' fnameescape(Fullpath(Current()))
+enddef
 
-function! filer#up() abort
-  let l:dir_from = fnamemodify(s:curdir(),':p:h:t')
-  let l:dir_to = fnamemodify(s:curdir(), ':p:h:h')
-  exe 'edit' fnameescape(l:dir_to) .. '/'
-  call search('\V\^' .. l:dir_from, 'c')
-endfunction
+export def Up(): void
+  const dir_from = fnamemodify(Curdir(), ':p:h:t')
+  const dir_to = fnamemodify(Curdir(), ':p:h:h')
+  exe 'edit' fnameescape(dir_to) .. '/'
+  search('\V\^' .. dir_from, 'c')
+enddef
 
-function! filer#home() abort
+export def Home(): void
   edit ~/
-endfunction
+enddef
 
-function! filer#reload() abort
+export def Reload(): void
   edit
-endfunction
+enddef
 
-function! filer#command() abort
-  let l:path = s:fullpath(s:current())
-  call feedkeys(':! ' .. shellescape(l:path) .. "\<c-home>\<right>", 'n')
-endfunction
+export def Command(): void
+  const path = Fullpath(Current())
+  feedkeys(':! ' .. shellescape(path) .. "\<c-home>\<right>", 'n')
+enddef
 
-function! filer#show_fullpath() abort
-  silent keepmarks keepjumps call setline(1, map(getline('1', '$'), {_, v -> s:fullpath(v)}))
-endfunction
+export def ShowFullpath(): void
+  silent keepmarks keepjumps setline(1, map(getline('1', '$'), (_, v) => Fullpath(v)))
+enddef
 
-function! filer#toggle_hidden() abort
-  let g:filer_show_hidden = !get(g:, 'filer_show_hidden', v:false)
-  call filer#reload()
-endfunction
+export def ToggleHidden(): void
+  g:filer_show_hidden = !get(g:, 'filer_show_hidden', false)
+  Reload()
+enddef
 
-function! filer#error(msg) abort
+export def Error(msg: string): void
   redraw
   echohl Error
-  echomsg a:msg
+  echomsg msg
   echohl None
-endfunction
+enddef

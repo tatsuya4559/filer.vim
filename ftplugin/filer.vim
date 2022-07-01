@@ -1,10 +1,13 @@
-nnoremap <silent> <Plug>(filer-down) :<C-u>call filer#down()<CR>
-nnoremap <silent> <Plug>(filer-up) :<C-u>call filer#up()<CR>
-nnoremap <silent> <Plug>(filer-reload) :<C-u>call filer#reload()<CR>
-nnoremap <silent> <Plug>(filer-home) :<C-u>call filer#home()<CR>
-nnoremap <silent> <Plug>(filer-toggle-hidden) :<C-u>call filer#toggle_hidden()<CR>
-nnoremap <silent> <Plug>(filer-command) :<C-u>call filer#command()<CR>
-nnoremap <silent> <Plug>(filer-fullpath) :<C-u>call filer#show_fullpath()<CR>
+vim9script
+
+import autoload 'filer.vim' as filer
+nnoremap <silent> <Plug>(filer-down) <ScriptCmd>filer.Down()<CR>
+nnoremap <silent> <Plug>(filer-up) <ScriptCmd>filer.Up()<CR>
+nnoremap <silent> <Plug>(filer-reload) <ScriptCmd>filer.Reload()<CR>
+nnoremap <silent> <Plug>(filer-home) <ScriptCmd>filer.Home()<CR>
+nnoremap <silent> <Plug>(filer-toggle-hidden) <ScriptCmd>filer.ToggleHidden()<CR>
+nnoremap <silent> <Plug>(filer-command) <ScriptCmd>filer.Command()<CR>
+nnoremap <silent> <Plug>(filer-fullpath) <ScriptCmd>filer.ShowFullpath()<CR>
 
 if !hasmapto('<Plug>(filer-down)')
   nmap <buffer> <CR> <Plug>(filer-down)
