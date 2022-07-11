@@ -1,8 +1,5 @@
 vim9script
 
-const save_cpo = &cpoptions
-set cpoptions&vim
-
 if exists('g:loaded_filer')
   finish
 endif
@@ -33,5 +30,3 @@ nnoremap <silent> <Plug>(filer-start) <ScriptCmd>filer.Start()<CR>
 if !hasmapto('<Plug>(filer-start)')
   nmap - <Plug>(filer-start)
 endif
-
-&cpoptions = save_cpo
