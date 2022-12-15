@@ -97,7 +97,7 @@ export def Command(): void
 enddef
 
 export def ShowFullpath(): void
-  silent keepmarks keepjumps setline(1, map(getline('1', '$'), (_, v) => Fullpath(v)))
+  silent keepmarks keepjumps setline(1, map(getline(1, '$'), (_, v) => Fullpath(v)))
 enddef
 
 export def ToggleHidden(): void
