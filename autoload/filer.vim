@@ -80,7 +80,7 @@ export def Up(): void
   const dir_from = fnamemodify(Curdir(), ':p:h:t')
   const dir_to = fnamemodify(Curdir(), ':p:h:h')
   exe 'edit' fnameescape(dir_to) .. '/'
-  search('\V\^' .. dir_from, 'c')
+  search('\V\^' .. dir_from .. '/', 'c')
 enddef
 
 export def Home(): void
