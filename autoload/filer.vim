@@ -1,32 +1,55 @@
 vim9script
 
+def StrContains(str: string, sub: string): bool
+  return stridx(str, sub) >= 0
+enddef
+
+def HasPrefix(str: string, prefix: string): bool
+  return str[ : len(prefix) - 1] ==# prefix
+enddef
+
+def HasSuffix(str: string, suffix: string): bool
+  return str[len(str) - len(suffix) : ] ==# suffix
+enddef
+
+def TrimSuffix(str: string, suffix: string): string
+  if !HasSuffix(str, suffix)
+    return str
+  endif
+  return str[ : len(str) - len(suffix) - 1]
+enddef
+
+def WithTrailingSlash(dir: string): string
+  return HasSuffix(dir, '/') ? dir : dir .. '/'
+enddef
+
 def JoinPath(path: string, ...paths: list<string>): string
   var result = path
   for p in paths
-    if result =~# '/$'
-      result ..= p
-    else
-      result ..= '/' .. p
-    endif
+    result = WithTrailingSlash(result) .. p
   endfor
   return result
 enddef
 
+def ToAbsolutePath(path: string): string
+  return fnamemodify(path, ':p')
+enddef
+
 def Name(base: string, fname: string): string
-  const path = base .. fname
+  const path = JoinPath(base, fname)
   var ftype = getftype(path)
   if ftype ==# 'link' || ftype ==# 'junction'
     if isdirectory(resolve(path))
       ftype = 'dir'
     endif
   endif
-  return fname .. (ftype ==# 'dir' ? '/' : '')
+  return ftype ==# 'dir' ? WithTrailingSlash(fname) : fname
 enddef
 
 def Compare(lhs: string, rhs: string): number
-  if lhs[-1 : ] ==# '/' && rhs[-1 : ] !=# '/'
+  if HasSuffix(lhs, '/') && !HasSuffix(rhs, '/')
     return -1
-  elseif lhs[-1 : ] !=# '/' && rhs[-1 : ] ==# '/'
+  elseif !HasSuffix(lhs, '/') && HasSuffix(rhs, '/')
     return 1
   endif
   if lhs < rhs
@@ -49,8 +72,11 @@ enddef
 def CompletePath(path: string): string
   if isabsolutepath(path)
     return path
+  # elseif IsRelativePath(path)
+  #   return path
+  else
+    return JoinPath(Curdir(), path)
   endif
-  return JoinPath(Curdir(), path)
 enddef
 
 export def Init(): void
@@ -58,10 +84,7 @@ export def Init(): void
   if !isdirectory(path)
     return
   endif
-  var dir = fnamemodify(path, ':p')
-  if isdirectory(dir) && dir !~# '/$'
-    dir ..= '/'
-  endif
+  const dir = WithTrailingSlash(ToAbsolutePath(path))
 
   if bufname('%') !=# dir
     exe 'noautocmd' 'silent' 'noswapfile' 'file' dir
@@ -70,7 +93,7 @@ export def Init(): void
   setlocal modifiable
   setlocal filetype=filer buftype=nofile bufhidden=delete nobuflisted noswapfile
   setlocal nowrap cursorline
-  final files = readdir(path, '1')->map((_, v) => Name(dir, v))
+  final files = readdir(dir, '1')->map((_, v) => Name(dir, v))
   if !get(g:, 'filer_show_hidden', false)
     filter(files, (_, v) => v =~# "^[^.]")
   endif
@@ -84,7 +107,7 @@ export def Start(): void
   if empty(dir)
     dir = getcwd()
   endif
-  exe 'edit' fnameescape(dir) .. '/'
+  exe 'edit' WithTrailingSlash(fnameescape(dir))
   search('\V\^' .. file_from, 'c')
 enddef
 
@@ -95,8 +118,8 @@ enddef
 export def Up(): void
   const dir_from = fnamemodify(Curdir(), ':p:h:t')
   const dir_to = fnamemodify(Curdir(), ':p:h:h')
-  exe 'edit' fnameescape(dir_to) .. '/'
-  search('\V\^' .. dir_from .. '/', 'c')
+  exe 'edit' WithTrailingSlash(fnameescape(dir_to))
+  search('\V\^' .. WithTrailingSlash(dir_from), 'c')
 enddef
 
 export def Home(): void
