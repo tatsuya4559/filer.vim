@@ -45,10 +45,6 @@ def Current(): string
   return getline('.')
 enddef
 
-def Fullpath(path: string): string
-  return CompletePath(path)
-enddef
-
 # Complete path joining with curdir.
 def CompletePath(path: string): string
   if isabsolutepath(path)
@@ -93,7 +89,7 @@ export def Start(): void
 enddef
 
 export def Down(): void
-  exe 'edit' fnameescape(Fullpath(Current()))
+  exe 'edit' fnameescape(CompletePath(Current()))
 enddef
 
 export def Up(): void
@@ -112,12 +108,12 @@ export def Reload(): void
 enddef
 
 export def Command(): void
-  const path = Fullpath(Current())
+  const path = CompletePath(Current())
   feedkeys(':! ' .. shellescape(path) .. "\<c-home>\<right>", 'n')
 enddef
 
 export def ShowFullpath(): void
-  silent keepmarks keepjumps setline(1, map(getline(1, '$'), (_, v) => Fullpath(v)))
+  silent keepmarks keepjumps setline(1, map(getline(1, '$'), (_, v) => CompletePath(v)))
 enddef
 
 export def ToggleHidden(): void
