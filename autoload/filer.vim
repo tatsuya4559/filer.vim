@@ -46,7 +46,15 @@ def Current(): string
 enddef
 
 def Fullpath(path: string): string
-  return (path =~# '^/' ? '' : Curdir()) .. path
+  return CompletePath(path)
+enddef
+
+# Complete path joining with curdir.
+def CompletePath(path: string): string
+  if isabsolutepath(path)
+    return path
+  endif
+  return JoinPath(Curdir(), path)
 enddef
 
 export def Init(): void
