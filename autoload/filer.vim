@@ -1,55 +1,23 @@
 vim9script
 
-def StrContains(str: string, sub: string): bool
-  return stridx(str, sub) >= 0
-enddef
-
-def HasPrefix(str: string, prefix: string): bool
-  return str[ : len(prefix) - 1] ==# prefix
-enddef
-
-def HasSuffix(str: string, suffix: string): bool
-  return str[len(str) - len(suffix) : ] ==# suffix
-enddef
-
-def TrimSuffix(str: string, suffix: string): string
-  if !HasSuffix(str, suffix)
-    return str
-  endif
-  return str[ : len(str) - len(suffix) - 1]
-enddef
-
-def WithTrailingSlash(dir: string): string
-  return HasSuffix(dir, '/') ? dir : dir .. '/'
-enddef
-
-def JoinPath(path: string, ...paths: list<string>): string
-  var result = path
-  for p in paths
-    result = WithTrailingSlash(result) .. p
-  endfor
-  return result
-enddef
-
-def ToAbsolutePath(path: string): string
-  return fnamemodify(path, ':p')
-enddef
+import './strings.vim'
+import './paths.vim'
 
 def Name(base: string, fname: string): string
-  const path = JoinPath(base, fname)
+  const path = paths.Join(base, fname)
   var ftype = getftype(path)
   if ftype ==# 'link' || ftype ==# 'junction'
     if isdirectory(resolve(path))
       ftype = 'dir'
     endif
   endif
-  return ftype ==# 'dir' ? WithTrailingSlash(fname) : fname
+  return ftype ==# 'dir' ? paths.WithTrailingSlash(fname) : fname
 enddef
 
 def Compare(lhs: string, rhs: string): number
-  if HasSuffix(lhs, '/') && !HasSuffix(rhs, '/')
+  if strings.HasSuffix(lhs, '/') && !strings.HasSuffix(rhs, '/')
     return -1
-  elseif !HasSuffix(lhs, '/') && HasSuffix(rhs, '/')
+  elseif !strings.HasSuffix(lhs, '/') && strings.HasSuffix(rhs, '/')
     return 1
   endif
   if lhs < rhs
@@ -70,13 +38,10 @@ enddef
 
 # Complete path joining with curdir.
 def CompletePath(path: string): string
-  if isabsolutepath(path)
+  if isabsolutepath(path) || paths.IsRelative(path)
     return path
-  # elseif IsRelativePath(path)
-  #   return path
-  else
-    return JoinPath(Curdir(), path)
   endif
+  return paths.Join(Curdir(), path)
 enddef
 
 export def Init(): void
@@ -84,7 +49,8 @@ export def Init(): void
   if !isdirectory(path)
     return
   endif
-  const dir = WithTrailingSlash(ToAbsolutePath(path))
+  const use_abspath = get(g:, 'filer_use_abspath', false)
+  const dir = paths.WithTrailingSlash(use_abspath ? paths.ToAbsolute(path) : paths.ToRelative(path))
 
   if bufname('%') !=# dir
     exe 'noautocmd' 'silent' 'noswapfile' 'file' dir
@@ -107,7 +73,7 @@ export def Start(): void
   if empty(dir)
     dir = getcwd()
   endif
-  exe 'edit' WithTrailingSlash(fnameescape(dir))
+  exe 'edit' paths.WithTrailingSlash(fnameescape(dir))
   search('\V\^' .. file_from, 'c')
 enddef
 
@@ -118,8 +84,8 @@ enddef
 export def Up(): void
   const dir_from = fnamemodify(Curdir(), ':p:h:t')
   const dir_to = fnamemodify(Curdir(), ':p:h:h')
-  exe 'edit' WithTrailingSlash(fnameescape(dir_to))
-  search('\V\^' .. WithTrailingSlash(dir_from), 'c')
+  exe 'edit' paths.WithTrailingSlash(fnameescape(dir_to))
+  search('\V\^' .. paths.WithTrailingSlash(dir_from), 'c')
 enddef
 
 export def Home(): void
@@ -142,11 +108,4 @@ enddef
 export def ToggleHidden(): void
   g:filer_show_hidden = !get(g:, 'filer_show_hidden', false)
   Reload()
-enddef
-
-export def Error(msg: string): void
-  redraw
-  echohl Error
-  echomsg msg
-  echohl None
 enddef
