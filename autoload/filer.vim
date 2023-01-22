@@ -1,5 +1,17 @@
 vim9script
 
+def JoinPath(path: string, ...paths: list<string>): string
+  var result = path
+  for p in paths
+    if result =~# '/$'
+      result ..= p
+    else
+      result ..= '/' .. p
+    endif
+  endfor
+  return result
+enddef
+
 def Name(base: string, fname: string): string
   const path = base .. fname
   var ftype = getftype(path)
