@@ -1,20 +1,23 @@
 vim9script
 
+import './strings.vim'
+import './paths.vim'
+
 def Name(base: string, fname: string): string
-  const path = base .. fname
+  const path = paths.Join(base, fname)
   var ftype = getftype(path)
   if ftype ==# 'link' || ftype ==# 'junction'
     if isdirectory(resolve(path))
       ftype = 'dir'
     endif
   endif
-  return fname .. (ftype ==# 'dir' ? '/' : '')
+  return ftype ==# 'dir' ? paths.WithTrailingSlash(fname) : fname
 enddef
 
 def Compare(lhs: string, rhs: string): number
-  if lhs[-1 : ] ==# '/' && rhs[-1 : ] !=# '/'
+  if strings.HasSuffix(lhs, '/') && !strings.HasSuffix(rhs, '/')
     return -1
-  elseif lhs[-1 : ] !=# '/' && rhs[-1 : ] ==# '/'
+  elseif !strings.HasSuffix(lhs, '/') && strings.HasSuffix(rhs, '/')
     return 1
   endif
   if lhs < rhs
@@ -33,8 +36,12 @@ def Current(): string
   return getline('.')
 enddef
 
-def Fullpath(path: string): string
-  return (path =~# '^/' ? '' : Curdir()) .. path
+# Complete path joining with curdir.
+def CompletePath(path: string): string
+  if isabsolutepath(path) || paths.IsRelative(path)
+    return path
+  endif
+  return paths.Join(Curdir(), path)
 enddef
 
 export def Init(): void
@@ -42,10 +49,8 @@ export def Init(): void
   if !isdirectory(path)
     return
   endif
-  var dir = fnamemodify(path, ':p')
-  if isdirectory(dir) && dir !~# '/$'
-    dir ..= '/'
-  endif
+  const use_abspath = get(g:, 'filer_use_abspath', false)
+  const dir = paths.WithTrailingSlash(use_abspath ? paths.ToAbsolute(path) : paths.ToRelative(path))
 
   if bufname('%') !=# dir
     exe 'noautocmd' 'silent' 'noswapfile' 'file' dir
@@ -54,7 +59,7 @@ export def Init(): void
   setlocal modifiable
   setlocal filetype=filer buftype=nofile bufhidden=delete nobuflisted noswapfile
   setlocal nowrap cursorline
-  final files = readdir(path, '1')->map((_, v) => Name(dir, v))
+  final files = readdir(dir, '1')->map((_, v) => Name(dir, v))
   if !get(g:, 'filer_show_hidden', false)
     filter(files, (_, v) => v =~# "^[^.]")
   endif
@@ -68,19 +73,19 @@ export def Start(): void
   if empty(dir)
     dir = getcwd()
   endif
-  exe 'edit' fnameescape(dir) .. '/'
+  exe 'edit' paths.WithTrailingSlash(fnameescape(dir))
   search('\V\^' .. file_from, 'c')
 enddef
 
 export def Down(): void
-  exe 'edit' fnameescape(Fullpath(Current()))
+  exe 'edit' fnameescape(CompletePath(Current()))
 enddef
 
 export def Up(): void
   const dir_from = fnamemodify(Curdir(), ':p:h:t')
   const dir_to = fnamemodify(Curdir(), ':p:h:h')
-  exe 'edit' fnameescape(dir_to) .. '/'
-  search('\V\^' .. dir_from .. '/', 'c')
+  exe 'edit' paths.WithTrailingSlash(fnameescape(dir_to))
+  search('\V\^' .. paths.WithTrailingSlash(dir_from), 'c')
 enddef
 
 export def Home(): void
@@ -92,22 +97,15 @@ export def Reload(): void
 enddef
 
 export def Command(): void
-  const path = Fullpath(Current())
+  const path = CompletePath(Current())
   feedkeys(':! ' .. shellescape(path) .. "\<c-home>\<right>", 'n')
 enddef
 
 export def ShowFullpath(): void
-  silent keepmarks keepjumps setline(1, map(getline(1, '$'), (_, v) => Fullpath(v)))
+  silent keepmarks keepjumps setline(1, map(getline(1, '$'), (_, v) => CompletePath(v)))
 enddef
 
 export def ToggleHidden(): void
   g:filer_show_hidden = !get(g:, 'filer_show_hidden', false)
   Reload()
-enddef
-
-export def Error(msg: string): void
-  redraw
-  echohl Error
-  echomsg msg
-  echohl None
 enddef
