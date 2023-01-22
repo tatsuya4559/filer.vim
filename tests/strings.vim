@@ -18,7 +18,7 @@ def TestContains(): void
     const msg = printf(
       'Contains(%s) want %s, but got %s',
       tt.input, tt.want, got)
-    assert.equals(tt.want, got, msg)
+    assert.equals(got, tt.want, msg)
   endfor
 enddef
 suite.TestContains = TestContains
@@ -37,7 +37,7 @@ def TestHasPrefix(): void
     const msg = printf(
       'HasPrefix(%s) want %s, but got %s',
       tt.input, tt.want, got)
-    assert.equals(tt.want, got, msg)
+    assert.equals(got, tt.want, msg)
   endfor
 enddef
 suite.TestHasPrefix = TestHasPrefix
@@ -56,7 +56,7 @@ def TestHasSuffix(): void
     const msg = printf(
       'HasSuffix(%s) want %s, but got %s',
       tt.input, tt.want, got)
-    assert.equals(tt.want, got, msg)
+    assert.equals(got, tt.want, msg)
   endfor
 enddef
 suite.TestHasSuffix = TestHasSuffix
@@ -74,7 +74,7 @@ def TestTrimSuffix(): void
     const msg = printf(
       'TrimSuffix("%s") want %s, but got %s',
       tt.input, tt.want, got)
-    assert.equals(tt.want, got, msg)
+    assert.equals(got, tt.want, msg)
   endfor
 enddef
 suite.TestTrimSuffix = TestTrimSuffix

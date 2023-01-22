@@ -16,7 +16,7 @@ def TestWithTrailingSlash(): void
     const msg = printf(
       'WithTrailingSlash("%s") want %s, but got %s',
       tt.input, tt.want, got)
-    assert.equals(tt.want, got, msg)
+    assert.equals(got, tt.want, msg)
   endfor
 enddef
 suite.TestWithTrailingSlash = TestWithTrailingSlash
@@ -32,7 +32,7 @@ def TestJoin(): void
     const msg = printf(
       'Join("%s") want %s, but got %s',
       tt.input, tt.want, got)
-    assert.equals(tt.want, got, msg)
+    assert.equals(got, tt.want, msg)
   endfor
 enddef
 suite.TestJoin = TestJoin
