@@ -13,15 +13,16 @@ def TestContains(): void
     {input: ['foobar', ''], want: true},
   ]
 
+  final child = themis#suite('TestContains')
   for tt in tests
-    const got = call(strings.Contains, tt.input)
-    const msg = printf(
-      'Contains(%s) want %s, but got %s',
-      tt.input, tt.want, got)
-    assert.equals(got, tt.want, msg)
+    const description = printf('Contains(%s)', tt.input)
+    child[description] = function((input, want) => {
+      const got = call(strings.Contains, input)
+      assert.equals(got, want)
+    }, [tt.input, tt.want])
   endfor
 enddef
-suite.TestContains = TestContains
+suite.__TestContains__ = TestContains
 
 def TestHasPrefix(): void
   const tests = [
@@ -32,15 +33,16 @@ def TestHasPrefix(): void
     {input: ['', 'f'], want: false},
   ]
 
+  final child = themis#suite('TestHasPrefix')
   for tt in tests
-    const got = call(strings.HasPrefix, tt.input)
-    const msg = printf(
-      'HasPrefix(%s) want %s, but got %s',
-      tt.input, tt.want, got)
-    assert.equals(got, tt.want, msg)
+    const description = printf('HasPrefix(%s)', tt.input)
+    child[description] = function((input, want) => {
+      const got = call(strings.HasPrefix, input)
+      assert.equals(got, want)
+    }, [tt.input, tt.want])
   endfor
 enddef
-suite.TestHasPrefix = TestHasPrefix
+suite.__TestHasPrefix__ = TestHasPrefix
 
 def TestHasSuffix(): void
   const tests = [
@@ -51,15 +53,16 @@ def TestHasSuffix(): void
     {input: ['', 'f'], want: false},
   ]
 
+  final child = themis#suite('TestHasSuffix')
   for tt in tests
-    const got = call(strings.HasSuffix, tt.input)
-    const msg = printf(
-      'HasSuffix(%s) want %s, but got %s',
-      tt.input, tt.want, got)
-    assert.equals(got, tt.want, msg)
+    const description = printf('HasSuffix(%s)', tt.input)
+    child[description] = function((input, want) => {
+      const got = call(strings.HasSuffix, input)
+      assert.equals(got, want)
+    }, [tt.input, tt.want])
   endfor
 enddef
-suite.TestHasSuffix = TestHasSuffix
+suite.__TestHasSuffix__ = TestHasSuffix
 
 def TestTrimSuffix(): void
   const tests = [
@@ -69,12 +72,13 @@ def TestTrimSuffix(): void
     {input: ['', 'foo'], want: ''},
   ]
 
+  final child = themis#suite('TestTrimSuffix')
   for tt in tests
-    const got = call(strings.TrimSuffix, tt.input)
-    const msg = printf(
-      'TrimSuffix("%s") want %s, but got %s',
-      tt.input, tt.want, got)
-    assert.equals(got, tt.want, msg)
+    const description = printf('TrimSuffix(%s)', tt.input)
+    child[description] = function((input, want) => {
+      const got = call(strings.TrimSuffix, input)
+      assert.equals(got, want)
+    }, [tt.input, tt.want])
   endfor
 enddef
-suite.TestTrimSuffix = TestTrimSuffix
+suite.__TestTrimSuffix__ = TestTrimSuffix
