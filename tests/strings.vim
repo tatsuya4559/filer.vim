@@ -1,6 +1,6 @@
 vim9script
 
-import autoload 'strings.vim'
+import '../autoload/strings.vim'
 
 final suite = themis#suite('strings')
 const assert = themis#helper('assert')
