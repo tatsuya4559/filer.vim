@@ -1,7 +1,7 @@
 vim9script
 
-import './strings.vim'
-import './paths.vim'
+import './filer/strings.vim'
+import './filer/paths.vim'
 
 def Name(base: string, fname: string): string
   const path = paths.Join(base, fname)

@@ -7,7 +7,7 @@ $(THEMIS):
 
 .PHONY: test
 test: $(THEMIS) ## Run all tests
-	$(THEMIS) tests/
+	$(THEMIS) tests/**
 
 .PHONY: help
 help: ## Display this help
